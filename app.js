@@ -117,7 +117,24 @@ function updateSentidos() {
   updateProgress();
 }
 
-async function loadMasterData() {
+// --- Evento "sync-master-data" -------------------------------------------
+// Sincroniza Viaturas, Motoristas e Rotas a partir do Power Automate.
+// É despoletado em três situações: carregamento da página, clique manual
+// no botão de sincronização, e um intervalo automático em segundo plano.
+const SYNC_MASTER_DATA_EVENT = 'sync-master-data';
+const SYNC_MASTER_DATA_INTERVAL_MS = Number(config.masterDataSyncIntervalMs) || 5 * 60 * 1000; // 5 min
+const syncMasterDataButton = document.querySelector('#syncMasterDataButton');
+let masterDataSyncInFlight = false;
+
+function requestMasterDataSync(detail = {}) {
+  document.dispatchEvent(new CustomEvent(SYNC_MASTER_DATA_EVENT, { detail }));
+}
+
+async function loadMasterData(event) {
+  if (masterDataSyncInFlight) return;
+  masterDataSyncInFlight = true;
+  syncMasterDataButton?.classList.add('spinning');
+
   try {
     if (!config.masterDataUrl) throw new Error('Endpoint mestre não configurado.');
     const separator = config.masterDataUrl.includes('?') ? '&' : '?';
@@ -150,7 +167,20 @@ async function loadMasterData() {
       select.innerHTML = '<option value="">Lista indisponível</option>';
     });
     updateSentidos();
+  } finally {
+    masterDataSyncInFlight = false;
+    syncMasterDataButton?.classList.remove('spinning');
   }
+}
+
+document.addEventListener(SYNC_MASTER_DATA_EVENT, loadMasterData);
+
+syncMasterDataButton?.addEventListener('click', () => {
+  requestMasterDataSync({ origin: 'manual' });
+});
+
+if (SYNC_MASTER_DATA_INTERVAL_MS > 0) {
+  setInterval(() => requestMasterDataSync({ origin: 'interval' }), SYNC_MASTER_DATA_INTERVAL_MS);
 }
 
 function setToday() {
@@ -264,5 +294,5 @@ document.querySelector('#newEntry').addEventListener('click', () => {
 });
 
 setToday();
-loadMasterData();
+requestMasterDataSync({ origin: 'load' });
 updateProgress();

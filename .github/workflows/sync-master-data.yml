@@ -44,7 +44,9 @@ jobs:
               "actualizadoEm": payload.get("actualizadoEm") or datetime.now(timezone.utc).isoformat(),
               "viaturas": clean(payload.get("viaturas"), ["codigo", "estado"]),
               "motoristas": clean(payload.get("motoristas"), ["codigo", "estado"]),
-              "rotas": clean(payload.get("rotas"), ["nome", "origem", "destino", "estado"]),
+              # No fluxo, o campo padronizado `codigo` recebe o Nome da Rota
+              # (por exemplo, "Albazine - Baixa"), tal como em abastecimentos.
+              "rotas": clean(payload.get("rotas"), ["codigo"]),
           }
 
           path.parent.mkdir(parents=True, exist_ok=True)

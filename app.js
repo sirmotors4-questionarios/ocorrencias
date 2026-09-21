@@ -3,6 +3,155 @@ const form = document.querySelector('#ocorrenciaForm');
 const submitButton = document.querySelector('#submitButton');
 const successPanel = document.querySelector('#successPanel');
 const formHint = document.querySelector('#formHint');
+const syncStatus = document.querySelector('#syncStatus');
+const routeSelect = document.querySelector('[data-list="rotas"]');
+const sentidoSelect = document.querySelector('#sentidoSelect');
+const routeDirections = new Map();
+
+const ROUTE_ENDPOINTS = {
+  1: ['Albazine', 'Baixa'],
+  2: ['Tchumene', 'Baixa'],
+  3: ['Casa Branca', 'UEM'],
+  4: ['Marracuene', 'Baixa'],
+  5: ['Matola Gare', 'Baixa'],
+  6: ['Matola Gare', 'Museu'],
+  7: ['Boane', 'Baixa'],
+  8: ['Missão Roque', 'Museu'],
+  9: ['Casa Branca', 'Museu'],
+  10: ['Boane', 'Mozal'],
+  11: ['Tchumene', 'Museu'],
+  12: ['Marracuene', 'Museu'],
+  13: ['Coca-Cola', 'Museu']
+};
+
+const normalise = value => String(value ?? '').trim();
+
+function firstValue(item, keys) {
+  if (typeof item === 'string') return normalise(item);
+  const key = keys.find(candidate => normalise(item?.[candidate]));
+  return key ? normalise(item[key]) : '';
+}
+
+function isActive(item) {
+  if (typeof item === 'string') return true;
+  const state = firstValue(item, [
+    'Disponível', 'Disponivel', 'Disponibilidade', 'Activo', 'Ativo',
+    'Estado', 'Estado Operacional', 'Status'
+  ]).toLowerCase();
+  if (!state) return true;
+  return !['não', 'nao', 'inactivo', 'inativa', 'inativo', 'indisponível',
+    'indisponivel', 'fora de serviço', 'fora de servico', 'desactivado',
+    'desativado'].includes(state);
+}
+
+function escapeHtml(value) {
+  return normalise(value).replace(/[&<>'"]/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+  }[char]));
+}
+
+function fillSelect(key, items, keys) {
+  const select = document.querySelector(`[data-list="${key}"]`);
+  const values = (Array.isArray(items) ? items : [])
+    .filter(isActive)
+    .map(item => firstValue(item, keys))
+    .filter(Boolean);
+  const unique = [...new Set(values)].sort((a, b) => a.localeCompare(b, 'pt'));
+  select.innerHTML = '<option value="">Seleccionar</option>' + unique
+    .map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`)
+    .join('');
+}
+
+function getRouteEndpoints(item, value) {
+  const origem = firstValue(item, ['Origem', 'origem']);
+  const destino = firstValue(item, ['Destino', 'destino']);
+  if (origem && destino) return [origem, destino];
+
+  const routeNumber = Number.parseInt(value.match(/\d+/)?.[0] || '', 10);
+  if (ROUTE_ENDPOINTS[routeNumber]) return ROUTE_ENDPOINTS[routeNumber];
+
+  const separator = [' → ', ' - ', ' – ', ' — ', ' / ']
+    .find(candidate => value.includes(candidate));
+  if (!separator) return null;
+  const parts = value.split(separator).map(normalise).filter(Boolean);
+  return parts.length >= 2 ? [parts[0], parts.slice(1).join(separator)] : null;
+}
+
+function fillRoutes(items) {
+  routeDirections.clear();
+  const options = (Array.isArray(items) ? items : [])
+    .filter(isActive)
+    .map(item => {
+      const value = firstValue(item, [
+        'Código da Rota', 'Codigo da Rota', 'ID_Rota', 'Nome da Rota',
+        'Rota', 'codigo', 'nome'
+      ]);
+      if (!value) return '';
+      const endpoints = getRouteEndpoints(item, value);
+      if (endpoints) routeDirections.set(value, endpoints);
+      return `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`;
+    })
+    .join('');
+  routeSelect.innerHTML = '<option value="">Seleccionar</option>' + options;
+  updateSentidos();
+}
+
+function updateSentidos() {
+  const endpoints = routeDirections.get(routeSelect.value);
+  sentidoSelect.value = '';
+  if (!routeSelect.value) {
+    sentidoSelect.disabled = true;
+    sentidoSelect.innerHTML = '<option value="">Seleccione primeiro a rota</option>';
+  } else if (!endpoints) {
+    sentidoSelect.disabled = true;
+    sentidoSelect.innerHTML = '<option value="">Sentidos indisponíveis</option>';
+  } else {
+    const [origem, destino] = endpoints;
+    const ida = `${origem} → ${destino}`;
+    const volta = `${destino} → ${origem}`;
+    sentidoSelect.disabled = false;
+    sentidoSelect.innerHTML = '<option value="">Seleccionar</option>' +
+      `<option value="${escapeHtml(ida)}">${escapeHtml(ida)}</option>` +
+      `<option value="${escapeHtml(volta)}">${escapeHtml(volta)}</option>`;
+  }
+  updateProgress();
+}
+
+async function loadMasterData() {
+  try {
+    if (!config.masterDataUrl) throw new Error('Endpoint mestre não configurado.');
+    const separator = config.masterDataUrl.includes('?') ? '&' : '?';
+    const response = await fetch(`${config.masterDataUrl}${separator}t=${Date.now()}`, {
+      cache: 'no-store'
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+
+    fillSelect('viaturas', data.viaturas, [
+      'Matrícula', 'Matricula', 'Matrícula da Viatura', 'Viatura', 'codigo'
+    ]);
+    fillSelect('motoristas', data.motoristas, [
+      'Nome do Motorista', 'Motorista', 'Nome Completo', 'Nome', 'codigo'
+    ]);
+    fillRoutes(data.rotas);
+
+    const updated = data.actualizadoEm ? new Date(data.actualizadoEm) : new Date();
+    document.querySelector('#dataTimestamp').textContent =
+      `Listas actualizadas: ${new Intl.DateTimeFormat('pt-MZ', {
+        dateStyle: 'short', timeStyle: 'short'
+      }).format(updated)}`;
+    syncStatus.className = 'sync online';
+    syncStatus.innerHTML = '<span></span>Dados actualizados';
+  } catch (error) {
+    console.error('Erro ao carregar dados mestre:', error);
+    syncStatus.className = 'sync error';
+    syncStatus.innerHTML = '<span></span>Listas indisponíveis';
+    document.querySelectorAll('select[data-list]').forEach(select => {
+      select.innerHTML = '<option value="">Lista indisponível</option>';
+    });
+    updateSentidos();
+  }
+}
 
 function setToday() {
   const now = new Date();
@@ -29,6 +178,8 @@ form.addEventListener('input', event => {
   event.target.classList.remove('invalid');
   updateProgress();
 });
+
+routeSelect.addEventListener('change', updateSentidos);
 
 form.addEventListener('submit', async event => {
   event.preventDefault();
@@ -105,6 +256,7 @@ form.addEventListener('submit', async event => {
 document.querySelector('#newEntry').addEventListener('click', () => {
   form.reset();
   setToday();
+  updateSentidos();
   form.hidden = false;
   successPanel.hidden = true;
   formHint.textContent = 'O Estado não é preenchido neste formulário; será calculado na base de dados.';
@@ -112,4 +264,5 @@ document.querySelector('#newEntry').addEventListener('click', () => {
 });
 
 setToday();
+loadMasterData();
 updateProgress();

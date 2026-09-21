@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-MZ">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b5aa8">
+  <meta name="description" content="Registo de ocorrências operacionais da SIR Motors.">
+  <title>Registo de Ocorrências | SIR Motors</title>
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark" aria-hidden="true">SIR</div>
+    <div>
+      <p class="eyebrow">SIR MOTORS</p>
+      <h1>Registo de Ocorrências</h1>
+    </div>
+    <div class="sync" id="syncStatus"><span></span>Formulário disponível</div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="form-title">
+      <div>
+        <p class="date-line" id="todayLabel"></p>
+        <h2 id="form-title">Nova ocorrência</h2>
+        <p>Registe a avaria, incidente ou outra ocorrência operacional. Os campos com * são obrigatórios.</p>
+      </div>
+      <div class="progress-wrap" aria-label="Progresso do formulário">
+        <strong id="progressText">0%</strong>
+        <div class="progress"><span id="progressBar"></span></div>
+      </div>
+    </section>
+
+    <form id="ocorrenciaForm" novalidate>
+      <section class="card">
+        <div class="section-heading"><span>01</span><div><h3>Identificação</h3><p>Quando e que tipo de ocorrência aconteceu</p></div></div>
+        <div class="grid">
+          <label>Data *<input type="date" name="data" required></label>
+          <label>Hora *<input type="time" name="hora" required></label>
+          <label>Tipo de ocorrência *
+            <select name="tipo_ocorrencia" required>
+              <option value="">Seleccionar</option>
+              <option>Avaria</option>
+              <option>Incidente</option>
+              <option>Acidente</option>
+              <option>Ocorrência Operacional</option>
+              <option>Outro</option>
+            </select>
+          </label>
+          <label>Categoria *
+            <select name="categoria" required>
+              <option value="">Seleccionar</option>
+              <option>Mecânica</option>
+              <option>Eléctrica</option>
+              <option>Pneu</option>
+              <option>Colisão</option>
+              <option>Operacional</option>
+              <option>Comportamental</option>
+              <option>Outro</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading"><span>02</span><div><h3>Operação</h3><p>Viatura, motorista e localização</p></div></div>
+        <div class="grid">
+          <label>Viatura *<input type="text" name="viatura" required placeholder="Ex.: ABC-123-MP"></label>
+          <label>Motorista *<input type="text" name="motorista" required></label>
+          <label>Rota<input type="text" name="rota"></label>
+          <label>Sentido<input type="text" name="sentido"></label>
+          <label class="wide">Local da ocorrência *<input type="text" name="local_ocorrencia" required placeholder="Local ou ponto de referência"></label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-heading"><span>03</span><div><h3>Descrição e impacto</h3><p>Registe o que aconteceu e o impacto na operação</p></div></div>
+        <div class="grid">
+          <label class="wide">Descrição *<textarea name="descricao" rows="4" required placeholder="Descreva a ocorrência de forma objectiva"></textarea></label>
+          <label>Criticidade *
+            <select name="criticidade" required>
+              <option value="">Seleccionar</option>
+              <option>Baixa</option>
+              <option>Média</option>
+              <option>Alta</option>
+              <option>Crítica</option>
+            </select>
+          </label>
+          <label>Impacto *
+            <select name="impacto" required>
+              <option value="">Seleccionar</option>
+              <option>Sem impacto</option>
+              <option>Atraso</option>
+              <option>Interrupção</option>
+              <option>Imobilização</option>
+            </select>
+          </label>
+          <label>Viatura imobilizada? *
+            <select name="viatura_imobilizada" required>
+              <option value="">Seleccionar</option><option>Sim</option><option>Não</option>
+            </select>
+          </label>
+          <label>Operação interrompida? *
+            <select name="operacao_interrompida" required>
+              <option value="">Seleccionar</option><option>Sim</option><option>Não</option>
+            </select>
+          </label>
+          <label>Passageiros afectados<input type="number" name="passageiros_afectados" min="0" step="1" inputmode="numeric" value="0"></label>
+          <label>Houve feridos? *
+            <select name="houve_feridos" required>
+              <option value="">Seleccionar</option><option>Sim</option><option>Não</option>
+            </select>
+          </label>
+          <label>Houve danos materiais? *
+            <select name="houve_danos_materiais" required>
+              <option value="">Seleccionar</option><option>Sim</option><option>Não</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <p id="formHint">O Estado não é preenchido neste formulário; será calculado na base de dados.</p>
+        <button type="submit" id="submitButton"><span>Enviar ocorrência</span><span aria-hidden="true">→</span></button>
+      </div>
+    </form>
+
+    <section class="success" id="successPanel" hidden aria-live="polite">
+      <div class="success-icon">✓</div>
+      <h2>Ocorrência registada</h2>
+      <p id="successMessage">Os dados foram enviados com sucesso.</p>
+      <button type="button" id="newEntry">Novo registo</button>
+    </section>
+  </main>
+
+  <footer><span>SIR Motors · Ocorrências Operacionais</span><span id="dataTimestamp"></span></footer>
+  <script src="config.js?v=1"></script>
+  <script src="app.js?v=1"></script>
+</body>
+</html>

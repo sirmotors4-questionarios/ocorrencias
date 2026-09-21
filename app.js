@@ -36,7 +36,7 @@ function isActive(item) {
   if (typeof item === 'string') return true;
   const state = firstValue(item, [
     'Disponível', 'Disponivel', 'Disponibilidade', 'Activo', 'Ativo',
-    'Estado', 'Estado Operacional', 'Status'
+    'Estado', 'Estado Operacional', 'Status', 'estado'
   ]).toLowerCase();
   if (!state) return true;
   return !['não', 'nao', 'inactivo', 'inativa', 'inativo', 'indisponível',
@@ -145,10 +145,12 @@ async function loadMasterData(event) {
     const data = await response.json();
 
     fillSelect('viaturas', data.viaturas, [
-      'Matrícula', 'Matricula', 'Matrícula da Viatura', 'Viatura', 'codigo'
+      'Matrícula', 'Matricula', 'Matrícula da Viatura', 'Viatura',
+      'matricula', 'codigo'
     ]);
     fillSelect('motoristas', data.motoristas, [
-      'Nome do Motorista', 'Motorista', 'Nome Completo', 'Nome', 'codigo'
+      'Nome do Motorista', 'Motorista', 'Nome Completo', 'Nome',
+      'nome', 'codigo'
     ]);
     fillRoutes(data.rotas);
 

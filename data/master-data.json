@@ -1,0 +1,20 @@
+{
+  "actualizadoEm": null,
+  "viaturas": [],
+  "motoristas": [],
+  "rotas": [
+    {"nome": "Albazine - Baixa", "origem": "Albazine", "destino": "Baixa", "estado": "ACTIVA"},
+    {"nome": "Tchumene - Baixa", "origem": "Tchumene", "destino": "Baixa", "estado": "ACTIVA"},
+    {"nome": "Casa Branca - UEM", "origem": "Casa Branca", "destino": "UEM", "estado": "ACTIVA"},
+    {"nome": "Marracuene - Baixa", "origem": "Marracuene", "destino": "Baixa", "estado": "ACTIVA"},
+    {"nome": "Matola Gare - Baixa", "origem": "Matola Gare", "destino": "Baixa", "estado": "ACTIVA"},
+    {"nome": "Matola Gare - Museu", "origem": "Matola Gare", "destino": "Museu", "estado": "ACTIVA"},
+    {"nome": "Boane - Baixa", "origem": "Boane", "destino": "Baixa", "estado": "ACTIVA"},
+    {"nome": "Missão Roque - Museu", "origem": "Missão Roque", "destino": "Museu", "estado": "ACTIVA"},
+    {"nome": "Casa Branca - Museu", "origem": "Casa Branca", "destino": "Museu", "estado": "ACTIVA"},
+    {"nome": "Boane - Mozal", "origem": "Boane", "destino": "Mozal", "estado": "ACTIVA"},
+    {"nome": "Tchumene - Museu", "origem": "Tchumene", "destino": "Museu", "estado": "ACTIVA"},
+    {"nome": "Marracuene - Museu", "origem": "Marracuene", "destino": "Museu", "estado": "ACTIVA"},
+    {"nome": "Coca-Cola - Museu", "origem": "Coca-Cola", "destino": "Museu", "estado": "ACTIVA"}
+  ]
+}

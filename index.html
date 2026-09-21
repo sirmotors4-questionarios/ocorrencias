@@ -65,10 +65,26 @@
       <section class="card">
         <div class="section-heading"><span>02</span><div><h3>Operação</h3><p>Viatura, motorista e localização</p></div></div>
         <div class="grid">
-          <label>Viatura *<input type="text" name="viatura" required placeholder="Ex.: ABC-123-MP"></label>
-          <label>Motorista *<input type="text" name="motorista" required></label>
-          <label>Rota<input type="text" name="rota"></label>
-          <label>Sentido<input type="text" name="sentido"></label>
+          <label>Viatura disponível *
+            <select name="viatura" data-list="viaturas" required>
+              <option value="">A carregar...</option>
+            </select>
+          </label>
+          <label>Motorista activo *
+            <select name="motorista" data-list="motoristas" required>
+              <option value="">A carregar...</option>
+            </select>
+          </label>
+          <label>Rota
+            <select name="rota" data-list="rotas">
+              <option value="">A carregar...</option>
+            </select>
+          </label>
+          <label>Sentido
+            <select name="sentido" id="sentidoSelect" disabled>
+              <option value="">Seleccione primeiro a rota</option>
+            </select>
+          </label>
           <label class="wide">Local da ocorrência *<input type="text" name="local_ocorrencia" required placeholder="Local ou ponto de referência"></label>
         </div>
       </section>
@@ -134,7 +150,7 @@
   </main>
 
   <footer><span>SIR Motors · Ocorrências Operacionais</span><span id="dataTimestamp"></span></footer>
-  <script src="config.js?v=1"></script>
-  <script src="app.js?v=1"></script>
+  <script src="config.js?v=2"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>

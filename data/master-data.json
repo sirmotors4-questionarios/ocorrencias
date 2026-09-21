@@ -1,5 +1,5 @@
 {
-  "actualizadoEm": "2026-09-21T13:30:03.5277630Z",
+  "actualizadoEm": "2026-09-21T13:32:30.9090358Z",
   "viaturas": [
     {
       "codigo": "AOT 435 MC",
@@ -308,5 +308,45 @@
       "estado": ""
     }
   ],
-  "rotas": []
+  "rotas": [
+    {
+      "codigo": "Albazine - Baixa"
+    },
+    {
+      "codigo": "Tchumene - Baixa"
+    },
+    {
+      "codigo": "Casa Branca - UEM"
+    },
+    {
+      "codigo": "Marracuene - Baixa"
+    },
+    {
+      "codigo": "Matola Gare - Baixa"
+    },
+    {
+      "codigo": "Matola Gare - Museu"
+    },
+    {
+      "codigo": "Boane - Baixa"
+    },
+    {
+      "codigo": "Missao Roque - Museu"
+    },
+    {
+      "codigo": "Casa Branca - Museu"
+    },
+    {
+      "codigo": "Boane - Mozal"
+    },
+    {
+      "codigo": "Tchumene - Museu"
+    },
+    {
+      "codigo": "Marracuene - Museu"
+    },
+    {
+      "codigo": "Coca-Cola - Museu"
+    }
+  ]
 }

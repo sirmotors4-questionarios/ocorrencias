@@ -83,8 +83,8 @@ function fillRoutes(items) {
     .filter(isActive)
     .map(item => {
       const value = firstValue(item, [
-        'Código da Rota', 'Codigo da Rota', 'ID_Rota', 'Nome da Rota',
-        'Rota', 'codigo', 'nome'
+        'Nome da Rota', 'Rota', 'nome', 'Código da Rota',
+        'Codigo da Rota', 'ID_Rota', 'codigo'
       ]);
       if (!value) return '';
       const endpoints = getRouteEndpoints(item, value);

@@ -7,6 +7,32 @@ const syncStatus = document.querySelector('#syncStatus');
 const routeSelect = document.querySelector('[data-list="rotas"]');
 const sentidoSelect = document.querySelector('#sentidoSelect');
 const routeDirections = new Map();
+const responsibleSelect = document.querySelector('#responsavelLancamento');
+const responsibleInput = document.querySelector('#novoResponsavel');
+const responsibleLabel = document.querySelector('#outroResponsavelLabel');
+const STORAGE_RESP = 'sirOcorrenciasResponsaveis';
+function storedResponsible() {
+  try { const a = JSON.parse(localStorage.getItem(STORAGE_RESP) || '[]'); return Array.isArray(a) ? a : []; }
+  catch { return []; }
+}
+function refreshResponsible(names = []) {
+  const last = responsibleSelect.value;
+  const unique = [...new Map([...storedResponsible(), ...names].map(x => String(x ?? '').trim()).filter(x => x && x.toLowerCase() !== 'outro').map(x => [x.toLowerCase(),x])).values()].sort((a,b)=>a.localeCompare(b,'pt'));
+  responsibleSelect.replaceChildren(new Option('Outro — indicar responsável','__outro__'), ...unique.map(x=>new Option(x,x)));
+  responsibleSelect.value = unique.includes(last) ? last : '__outro__';
+  toggleResponsible();
+}
+function toggleResponsible() {
+  const other = responsibleSelect.value === '__outro__';
+  responsibleLabel.hidden = !other;
+  responsibleInput.disabled = !other;
+  responsibleInput.required = other;
+  updateProgress();
+}
+responsibleSelect.addEventListener('change',toggleResponsible);
+function responsibleName() { return (responsibleSelect.value === '__outro__' ? responsibleInput.value : responsibleSelect.value).trim(); }
+refreshResponsible();
+
 
 const ROUTE_ENDPOINTS = {
   1: ['Albazine', 'Baixa'],
@@ -153,6 +179,8 @@ async function loadMasterData(event) {
       'nome', 'codigo'
     ]);
     fillRoutes(data.rotas);
+    const nomes = data.responsaveisLancamento || data.responsaveis_lancamento || data.responsaveis || [];
+    if (Array.isArray(nomes)) refreshResponsible(nomes.map(x => typeof x === 'string' ? x : x?.['R. Lançamento'] || x?.nome || ''));
 
     const updated = data.actualizadoEm ? new Date(data.actualizadoEm) : new Date();
     document.querySelector('#dataTimestamp').textContent =
@@ -226,8 +254,16 @@ form.addEventListener('submit', async event => {
     return;
   }
 
+  const responsible = responsibleName();
+  if (!responsible) {
+    responsibleInput.classList.add('invalid');
+    responsibleInput.focus();
+    formHint.textContent = 'Indique o responsável pelo lançamento.';
+    return;
+  }
   const fd = new FormData(form);
   const payload = {
+    'R. Lançamento': responsible,
     data: fd.get('data'),
     hora: fd.get('hora'),
     tipo_ocorrencia: fd.get('tipo_ocorrencia'),
@@ -270,6 +306,8 @@ form.addEventListener('submit', async event => {
       localStorage.setItem('sirOcorrenciasDemo', JSON.stringify(entries));
     }
 
+    try { localStorage.setItem(STORAGE_RESP, JSON.stringify([...new Set([...storedResponsible(), responsible])])); } catch {}
+    refreshResponsible([responsible]);
     form.hidden = true;
     successPanel.hidden = false;
     document.querySelector('#successMessage').textContent = config.demoMode
@@ -287,6 +325,8 @@ form.addEventListener('submit', async event => {
 
 document.querySelector('#newEntry').addEventListener('click', () => {
   form.reset();
+  responsibleInput.value = '';
+  refreshResponsible();
   setToday();
   updateSentidos();
   form.hidden = false;

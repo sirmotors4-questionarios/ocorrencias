@@ -60,6 +60,14 @@
               <option>Outro</option>
             </select>
           </label>
+          <label class="wide">Nome do responsável pelo lançamento *
+            <select name="responsavel_seleccao" id="responsavelLancamento" required>
+              <option value="__outro__">Outro — indicar responsável</option>
+            </select>
+          </label>
+          <label class="wide" id="outroResponsavelLabel">Indicar outro nome *
+            <input name="novo_responsavel" id="novoResponsavel" type="text" maxlength="120" autocomplete="name" placeholder="Nome de quem regista a ocorrência" required>
+          </label>
         </div>
       </section>
 
@@ -87,14 +95,6 @@
             </select>
           </label>
           <label class="wide">Local da ocorrência *<input type="text" name="local_ocorrencia" required placeholder="Local ou ponto de referência"></label>
-          <label class="wide">R. Lançamento *
-            <select name="responsavel_seleccao" id="responsavelLancamento" required>
-              <option value="__outro__">Outro — indicar responsável</option>
-            </select>
-          </label>
-          <label class="wide" id="outroResponsavelLabel">Nome do responsável pelo lançamento *
-            <input name="novo_responsavel" id="novoResponsavel" type="text" maxlength="120" autocomplete="name" placeholder="Nome de quem regista a ocorrência" required>
-          </label>
         </div>
       </section>
 
@@ -160,6 +160,6 @@
 
   <footer><span>SIR Motors · Ocorrências Operacionais</span><span id="dataTimestamp"></span></footer>
   <script src="config.js?v=4"></script>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
